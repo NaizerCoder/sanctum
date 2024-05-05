@@ -21,18 +21,17 @@ export default {
     },
 
     methods:{
-
         login(){
-
             axios.get('/sanctum/csrf-cookie').then(response => {
                 axios.post('/login',{email:this.email, password:this.password})
                     .then( res => {
                         console.log(res);
                     })
+                    .catch( error => {
+                        console.log(error.response);
+                    })
             });
-
         }
-
     }
 }
 </script>
