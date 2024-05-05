@@ -8,7 +8,7 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <title>JWT PRO</title>
+    <title>SANCTUM PRO</title>
 </head>
 <body>
 
