@@ -19,6 +19,10 @@
                         <li class="nav-item">
                             <router-link :to="{name:'user.registration'}" class="nav-link active" aria-current="page">REGISTRATION</router-link>
                         </li>
+
+                        <li class="nav-item">
+                            <a @click="logout" href="#" class="nav-link active">LOGOUT</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -32,8 +36,17 @@
 </template>
 
 <script>
+
 export default {
-    name: "Index"
+    name: "Index",
+    methods:{
+        logout(){
+            axios.post('/logout')
+                .then(response => {
+                    this.$router.push({name: 'user.login'})
+                })
+        }
+    }
 }
 </script>
 
