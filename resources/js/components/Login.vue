@@ -5,7 +5,6 @@
         <input v-model="password" type="password" class="form-control mb-4" placeholder="password">
         <input @click.prevent="login" type="submit" class="btn btn-primary" value="Login">
 
-
     </div>
 </template>
 
@@ -13,24 +12,25 @@
 export default {
     name: "Login",
 
-    data(){
-        return{
+    data() {
+        return {
             email: null,
             password: null
         }
     },
 
-    methods:{
-        login(){
-            axios.get('/sanctum/csrf-cookie').then(response => {
-                axios.post('/login',{email:this.email, password:this.password})
-                    .then( res => {
-                        console.log(res);
-                    })
-                    .catch( error => {
-                        console.log(error.response);
-                    })
-            });
+    methods: {
+        login() {
+            axios.get('/sanctum/csrf-cookie')
+                .then(response => {
+                    axios.post('/login', {email: this.email, password: this.password})
+                        .then(res => {
+                            console.log(res);
+                        })
+                        .catch(error => {
+                            console.log(error.response);
+                        })
+                })
         }
     }
 }
