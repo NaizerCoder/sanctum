@@ -1,5 +1,5 @@
 <template>
-    <div class="w-25">
+    <div>
 
         <input v-model="name" type="name" class="form-control mb-2 " placeholder="name">
         <input v-model="email" type="email" class="form-control mb-2 " placeholder="email">
@@ -24,7 +24,6 @@ export default {
 
     methods: {
         register() {
-
             axios.get('/sanctum/csrf-cookie')
                 .then(response => {
                     axios.post('/register', {
@@ -34,10 +33,11 @@ export default {
                         password_confirmation: this.password_confirmation
                     })
                         .then(response => {
-                            console.log(response);
+                            localStorage.setItem('x-xsrf-token',response.config.headers['X-XSRF-TOKEN'])
+                            this.$router.push({name: 'user.personal'})
                         })
                         .catch(error => {
-                            console.log(error.response);
+                            console.log(error.response.data.message);
                         })
                 })
         }
