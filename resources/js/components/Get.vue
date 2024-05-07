@@ -1,5 +1,5 @@
 <template>
-    <div>GET</div>
+
 </template>
 
 <script>
@@ -12,9 +12,12 @@ export default {
 
     methods:{
         getData(){
-            axios.get('api/get')
+            axios.get('/api/get')
                 .then( res => {
-                    console.log(res);
+                    //console.log(res);
+                })
+                .catch(error => {
+                    console.log(error);
                 })
         }
     }

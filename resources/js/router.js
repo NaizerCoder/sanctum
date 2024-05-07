@@ -19,9 +19,41 @@ const route = VueRouter.createRouter ({
             component: () => import('./components/Registration.vue'),
             name:'user.registration'
         },
+        {
+            path:'/personal',
+            component: () => import('./components/Personal.vue'),
+            name:'user.personal'
+        },
 
     ],
 
 })
+
+ route.beforeEach((to, from, next)=>{
+
+    const token = localStorage.getItem('x-xsrf-token')
+
+    if(!token){
+        if( to.name === 'user.login' || to.name === 'user.registration'){
+            return next()
+        }
+        else return next({
+            name:'user.login'
+        })
+    }
+
+    if(token){
+        if(to.name ==='user.login' || to.name === 'user.registration'){
+            return next({
+                name:'user.personal'
+            })
+        }
+    }
+
+    next()
+
+ })
+
+
 
 export default route
