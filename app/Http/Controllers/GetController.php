@@ -8,6 +8,6 @@ class GetController extends Controller
 {
     public function __invoke()
     {
-        return response(['content' => 'Получили контент их Контроллера при обращении к защищенному роуту (middleware - auth:sanctum)']);
+        return response(['content' => 'Получили контент из Контроллера при обращении к защищенному роуту (middleware - auth:sanctum)']);
     }
 }

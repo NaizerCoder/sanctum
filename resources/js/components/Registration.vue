@@ -3,25 +3,25 @@
 
         <div class="input-group mb-3">
             <span class="input-group-text bg-primary"><i class="bi bi-person-plus-fill text-white"></i></span>
-            <input v-model="name" @keyup.enter="store" type="text" class="form-control" placeholder="Имя">
+            <input v-model="name" @keyup.enter="register" type="text" class="form-control" placeholder="Имя">
         </div>
         <div v-if="this.errors.user.name" class="text-danger" style="margin-top: -10px">{{ this.errors.user.name }}</div>
 
         <div class="input-group mb-3">
             <span class="input-group-text bg-primary"><i class="bi bi-person-plus-fill text-white"></i></span>
-            <input v-model="email" @keyup.enter="store" type="email" class="form-control" placeholder="E-mail">
+            <input v-model="email" @keyup.enter="register" type="email" class="form-control" placeholder="E-mail">
         </div>
         <div v-if="this.errors.email" class="text-danger" style="margin-top: -10px">{{ this.errors.email }}</div>
 
         <div class="input-group mb-3">
             <span class="input-group-text bg-primary"><i class="bi bi-person-plus-fill text-white"></i></span>
-            <input v-model="password" @keyup.enter="store" type="password" class="form-control" placeholder="Пароль">
+            <input v-model="password" @keyup.enter="register" type="password" class="form-control" placeholder="Пароль">
         </div>
         <div v-if="this.errors.password" class="text-danger" style="margin-top: -10px">{{ this.errors.password }}</div>
 
         <div class="input-group mb-3">
             <span class="input-group-text bg-primary"><i class="bi bi-person-plus-fill text-white"></i></span>
-            <input v-model="password_confirmation"  @keyup.enter="store" type="password" class="form-control" placeholder="Повторите пароль">
+            <input v-model="password_confirmation"  @keyup.enter="register" type="password" class="form-control" placeholder="Повторите пароль">
         </div>
         <div v-if="this.errors.password_confirmation" class="text-danger" style="margin-top: -10px">
             {{ this.errors.password_confirmation }}
