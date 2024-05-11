@@ -24,6 +24,10 @@ const route = VueRouter.createRouter ({
             component: () => import('./components/Personal.vue'),
             name:'user.personal'
         },
+        {
+            path:'/:catchAll(.*)', component: () => import('./components/Personal.vue'),
+            name:'404'
+        },
 
     ],
 
@@ -43,17 +47,16 @@ const route = VueRouter.createRouter ({
     }
 
     if(token){
+
         if(to.name ==='user.login' || to.name === 'user.registration'){
             return next({
                 name:'user.personal'
             })
         }
     }
-
     next()
 
  })
-
 
 
 export default route
