@@ -41,6 +41,11 @@
                         </li>
 
                         <li class="nav-item">
+                            <router-link :to="{name:'dropzone.index'}" class="nav-link active" aria-current="page">DROPZONE
+                            </router-link>
+                        </li>
+
+                        <li class="nav-item">
                             <router-link :to="{name:'user.personal'}" class="nav-link active" aria-current="page">
                                 PERSONAL
                             </router-link>

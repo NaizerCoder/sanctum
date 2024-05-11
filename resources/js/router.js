@@ -25,6 +25,10 @@ const route = VueRouter.createRouter ({
             name:'user.personal'
         },
         {
+            path:'/dropzone', component: () => import('./components/Dropzone.vue'),
+            name:'dropzone.index'
+        },
+        {
             path:'/:catchAll(.*)', component: () => import('./components/Personal.vue'),
             name:'404'
         },
