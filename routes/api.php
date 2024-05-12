@@ -14,8 +14,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
-
 Route::group(['middleware' => 'auth:sanctum', 'namespace' => 'App\Http\Controllers'], function(){
+
     Route::get('/get','GetController');
+
+    Route::group(['prefix'=>'posts', 'namespace'=>'Dropzone\Post'], function(){
+        Route::post('/','StoreController');
+    });
 });
+
+

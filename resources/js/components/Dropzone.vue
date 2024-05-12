@@ -1,9 +1,13 @@
 <template>
-    <div class="w-25 border-dashed rounded-top">
-        <div ref="dropzone" class="btn d-block text-center bg-light-subtle p-5">
+    <form class="w-25">
+
+        <input v-model="title" type="text" class="form-control mb-2" placeholder="title">
+        <div ref="dropzone" class="h-auto pt-4 pb-4 mb-3 text-center border-dashed rounded bgd-gray"
+             style="cursor: pointer;">
             UPLOAD
         </div>
-    </div>
+        <input @click.prevent="store" type="submit" class="btn btn-success" value="Send">
+    </form>
 </template>
 
 <script>
@@ -15,13 +19,57 @@ export default {
     data() {
         return {
             dropzone: null,
+            title: '',
+            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
         }
     },
     mounted() {
         this.dropzone = new Dropzone(this.$refs.dropzone, {
 
-            url: 'url'
+            url: '/api/posts',
+            autoProcessQueue: false,
+            addRemoveLinks:true,
+            headers: {
+                //"authorization": "Bearer " + localStorage.getItem('x-xsrf-token'),
+                //'x-csrf-token': 'E7iznsPE6fbz7osaa2Hfm8f9yn0UDYQWxaHuby3p',
+                'x-csrf-token': this.csrf,
+                //'x-xsrf-token': localStorage.getItem('x-xsrf-token'),
+            },
+
         })
+    },
+    methods: {
+        store() {
+
+            // axios.get('/sanctum/csrf-cookie')
+            //     .then(response => {
+                    //step 1
+                    // axios.post('/api/posts', {'images': this.dropzone.getAcceptedFiles()})
+                    //     .then(res => {
+                    //         console.log(res)
+                    //     })
+
+                    //step 2
+                    const data = new FormData()
+                    const files = this.dropzone.getAcceptedFiles()
+                    files.forEach(file =>{
+                        data.append('images[]',file)
+                        this.dropzone.removeFile(file)
+                    })
+
+                    data.append('title',this.title)
+                    this.title=''
+
+                    axios.post('/api/posts',data)
+                        .then(res => {
+                            console.log(res)
+                        })
+                // })
+
+
+            //console.log(this.dropzone.getAcceptedFiles());
+        }
+
     }
 }
 </script>
