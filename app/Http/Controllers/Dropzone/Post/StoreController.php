@@ -30,7 +30,6 @@ class StoreController extends Controller
             ]);
         }
 
-
         return response()->json('success','200');
     }
 }
