@@ -9,9 +9,14 @@
         <input @click.prevent="store" type="submit" class="btn btn-success" value="Send">
 
         <div v-if="post">
-            <h3>{{post.title}}</h3>
-            <div v-for="image in post.images">
-                <img :src=image.url class="mb-2 w-25">
+            <h3>{{ post.title }}</h3>
+            <div v-for="image in post.images" class="mb-3">
+                <div>
+                    <img :src=image.url class="mb-2 w-75" alt="">
+                </div>
+                <div>
+                    <img :src=image.prev_url alt="">
+                </div>
             </div>
         </div>
     </form>
@@ -28,7 +33,7 @@ export default {
             dropzone: null,
             title: '',
             csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            post:{}
+            post: {}
         }
     },
     mounted() {
@@ -36,7 +41,7 @@ export default {
 
             url: '/api/posts',
             autoProcessQueue: false,
-            addRemoveLinks:true,
+            addRemoveLinks: true,
             headers: {
                 //"authorization": "Bearer " + localStorage.getItem('x-xsrf-token'),
                 //'x-csrf-token': 'E7iznsPE6fbz7osaa2Hfm8f9yn0UDYQWxaHuby3p',
@@ -53,35 +58,35 @@ export default {
 
             // axios.get('/sanctum/csrf-cookie')
             //     .then(response => {
-                    //step 1
-                    // axios.post('/api/posts', {'images': this.dropzone.getAcceptedFiles()})
-                    //     .then(res => {
-                    //         console.log(res)
-                    //     })
+            //step 1
+            // axios.post('/api/posts', {'images': this.dropzone.getAcceptedFiles()})
+            //     .then(res => {
+            //         console.log(res)
+            //     })
 
-                    //step 2
-                    const data = new FormData()
-                    const files = this.dropzone.getAcceptedFiles()
-                    files.forEach(file =>{
-                        data.append('images[]',file)
-                        this.dropzone.removeFile(file)
-                    })
+            //step 2
+            const data = new FormData()
+            const files = this.dropzone.getAcceptedFiles()
+            files.forEach(file => {
+                data.append('images[]', file)
+                this.dropzone.removeFile(file)
+            })
 
-                    data.append('title',this.title)
-                    this.title=''
+            data.append('title', this.title)
+            this.title = ''
 
-                    axios.post('/api/posts',data)
-                        .then(res => {
-                            this.getPost()
-                        })
-                // })
+            axios.post('/api/posts', data)
+                .then(res => {
+                    this.getPost()
+                })
+            // })
 
 
             //console.log(this.dropzone.getAcceptedFiles());
         },
-        getPost(){
+        getPost() {
             axios.get('/api/posts')
-                .then( res => {
+                .then(res => {
                     this.post = res.data.data
                 })
         }
