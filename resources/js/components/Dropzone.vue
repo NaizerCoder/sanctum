@@ -7,6 +7,13 @@
             UPLOAD
         </div>
         <input @click.prevent="store" type="submit" class="btn btn-success" value="Send">
+
+        <div v-if="post">
+            <h3>{{post.title}}</h3>
+            <div v-for="image in post.images">
+                <img :src=image.url class="mb-2 w-25">
+            </div>
+        </div>
     </form>
 </template>
 
@@ -21,6 +28,7 @@ export default {
             dropzone: null,
             title: '',
             csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            post:{}
         }
     },
     mounted() {
@@ -37,6 +45,8 @@ export default {
             },
 
         })
+
+        this.getPost()
     },
     methods: {
         store() {
@@ -62,12 +72,18 @@ export default {
 
                     axios.post('/api/posts',data)
                         .then(res => {
-                            console.log(res)
+                            this.getPost()
                         })
                 // })
 
 
             //console.log(this.dropzone.getAcceptedFiles());
+        },
+        getPost(){
+            axios.get('/api/posts')
+                .then( res => {
+                    this.post = res.data.data
+                })
         }
 
     }
