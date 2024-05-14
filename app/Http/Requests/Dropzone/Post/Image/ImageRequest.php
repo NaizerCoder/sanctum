@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Dropzone\Post;
+namespace App\Http\Requests\Dropzone\Post\Image;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreRequest extends FormRequest
+class ImageRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +22,7 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required',
-            'images' => 'required|array',
-            'content' => 'nullable|string'
+            'image' => 'required|file',
         ];
     }
 }

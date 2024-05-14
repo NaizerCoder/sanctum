@@ -2,6 +2,11 @@
     <form class="w-25">
 
         <input v-model="title" type="text" class="form-control mb-2" placeholder="title">
+        <div class="mb-2">
+            <VueEditor v-model="content" useCustomImageHandler
+                       @image-added="handleImageAdded"
+            />
+        </div>
         <div ref="dropzone" class="h-auto pt-4 pb-4 mb-3 text-center border-dashed rounded bgd-gray"
              style="cursor: pointer;">
             UPLOAD
@@ -24,16 +29,21 @@
 
 <script>
 import {Dropzone} from "dropzone";
-
+import {VueEditor} from "vue3-editor"
 export default {
     name: "Dropzone",
+
+    components:{
+        VueEditor
+    },
 
     data() {
         return {
             dropzone: null,
             title: '',
             csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            post: {}
+            post: {},
+            content: "",
         }
     },
     mounted() {
@@ -73,7 +83,9 @@ export default {
             })
 
             data.append('title', this.title)
+            data.append('content', this.content)
             this.title = ''
+            this.content = ''
 
             axios.post('/api/posts', data)
                 .then(res => {
@@ -89,6 +101,21 @@ export default {
                 .then(res => {
                     this.post = res.data.data
                 })
+        },
+        handleImageAdded: function(file, Editor, cursorLocation, resetUploader) {
+
+            const formData = new FormData();
+            formData.append("image", file);
+
+            axios.post('/api/posts/images',formData)
+                .then(result => {
+                    const url = result.data.url; // Get url from response
+                    Editor.insertEmbed(cursorLocation, "image", url);
+                    resetUploader();
+                })
+                .catch(err => {
+                    console.log(err);
+                });
         }
 
     }
