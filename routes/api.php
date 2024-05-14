@@ -19,9 +19,17 @@ Route::group(['middleware' => 'auth:sanctum', 'namespace' => 'App\Http\Controlle
     Route::get('/get','GetController');
 
     Route::group(['prefix'=>'posts', 'namespace'=>'Dropzone\Post'], function(){
+
         Route::post('/','StoreController');
         Route::get('/','IndexController');
+
+        Route::group(['prefix'=>'images', 'namespace'=>'Image'], function(){
+            Route::post('/','StoreController');
+
+        });
     });
+
+
 });
 
 
