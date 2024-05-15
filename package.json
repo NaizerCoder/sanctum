@@ -17,6 +17,7 @@
     "dependencies": {
         "bootstrap-vue-3": "^0.3.12",
         "dropzone": "^6.0.0-beta.2",
+        "quill": "^2.0.2",
         "vue-loader": "^17.4.2",
         "vue-router": "^4.3.2",
         "vue3-editor": "^0.1.1"

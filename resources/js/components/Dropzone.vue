@@ -1,39 +1,70 @@
 <template>
-    <form class="w-25">
-
-        <input v-model="title" type="text" class="form-control mb-2" placeholder="title">
+    <form class="w-50">
+        <div w-25>
+            <input v-model="title" type="text" class="form-control mb-2" placeholder="title">
+        </div>
+        <div v-if="this.errors.title" class="text-danger" style="margin-top: -10px">{{ this.errors.title }}</div>
         <div class="mb-2">
-            <VueEditor v-model="content" useCustomImageHandler
+            <VueEditor v-model="content"
+                       useCustomImageHandler
                        @image-added="handleImageAdded"
+                       :editor-toolbar="customToolbar"
             />
         </div>
-        <div ref="dropzone" class="h-auto pt-4 pb-4 mb-3 text-center border-dashed rounded bgd-gray"
+        <div ref="dropzone" class="h-auto pt-4 pb-4 mb-3 w-25 text-center border-dashed rounded bgd-gray"
              style="cursor: pointer;">
-            UPLOAD
+            UPLOAD IMAGES
         </div>
-        <input @click.prevent="store" type="submit" class="btn btn-success" value="Send">
-
-        <div v-if="post">
-            <h3>{{ post.title }}</h3>
-            <div v-for="image in post.images" class="mb-3">
-                <div>
-                    <img :src=image.url class="mb-2 w-75" alt="">
-                </div>
-                <div>
-                    <img :src=image.prev_url alt="">
-                </div>
-            </div>
-        </div>
+        <div v-if="this.errors.images" class="text-danger" style="margin-top: -10px">{{ this.errors.images }}</div>
+        <input @click.prevent="store" type="submit" class="btn btn-success mb-3" value="Отправить">
     </form>
+
+    <h2>ПОСЛЕДНЕЕ СООБЩЕНИЕ</h2>
+    <a @click.prevent="event" href="#">EDIT</a>
+
+    <div v-if="post">
+        <table class="table table-bordered">
+            <tr>
+                <td colspan="2">
+                    <h4>{{ post.title }}</h4>
+                </td>
+            </tr>
+            <tr v-if="post.images">
+                <td colspan="2" class="text-center">Изображения DROPBOX</td>
+            </tr>
+            <tr v-for="image in post.images">
+                <td>
+                    Исходное изображение
+                    <br/>
+                    <img :src=image.url class="mb-2" style="width:50%" alt="">
+                </td>
+                <td>
+                    Миниатюра 100x100
+                    <br/>
+                    <img :src=image.prev_url alt="">
+                </td>
+            </tr>
+            <tr v-if="post.content">
+                <td colspan="2" class="text-center">
+                    Контент
+                    <div class="ql-editor" v-html="post.content"></div>
+                </td>
+
+            </tr>
+        </table>
+
+    </div>
+
 </template>
 
 <script>
 import {Dropzone} from "dropzone";
 import {VueEditor} from "vue3-editor"
+
 export default {
     name: "Dropzone",
 
-    components:{
+    components: {
         VueEditor
     },
 
@@ -44,39 +75,40 @@ export default {
             csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             post: {},
             content: "",
+            customToolbar: [
+                [{size: ['small', false, 'large', 'huge']}],
+                ["bold", "italic", "underline"],
+                [{'align': [false]}],
+                [{'align': ['center']}],
+                [{'align': ['right']}],
+                [{header: [1, 2, 3, 4, 5, 6, false]}],
+                [{list: "ordered"}, {list: "bullet"}],
+                ["image"],
+            ],
+            errors: {
+                images: null,
+                title: null
+            },
+            event_edit: null,
         }
     },
     mounted() {
         this.dropzone = new Dropzone(this.$refs.dropzone, {
-
             url: '/api/posts',
             autoProcessQueue: false,
             addRemoveLinks: true,
             headers: {
-                //"authorization": "Bearer " + localStorage.getItem('x-xsrf-token'),
-                //'x-csrf-token': 'E7iznsPE6fbz7osaa2Hfm8f9yn0UDYQWxaHuby3p',
                 'x-csrf-token': this.csrf,
-                //'x-xsrf-token': localStorage.getItem('x-xsrf-token'),
             },
-
+            acceptedFiles: "image/jpeg,image/png,image/gif"
         })
-
         this.getPost()
     },
     methods: {
         store() {
-
-            // axios.get('/sanctum/csrf-cookie')
-            //     .then(response => {
-            //step 1
-            // axios.post('/api/posts', {'images': this.dropzone.getAcceptedFiles()})
-            //     .then(res => {
-            //         console.log(res)
-            //     })
-
-            //step 2
             const data = new FormData()
             const files = this.dropzone.getAcceptedFiles()
+
             files.forEach(file => {
                 data.append('images[]', file)
                 this.dropzone.removeFile(file)
@@ -91,8 +123,12 @@ export default {
                 .then(res => {
                     this.getPost()
                 })
-            // })
-
+                .catch(error => {
+                    if (error.response.data.errors) {
+                        this.errors.images = (error.response.data.errors.images) ? error.response.data.errors.images[0] : null
+                        this.errors.title = (error.response.data.errors.title) ? error.response.data.errors.title[0] : null
+                    }
+                })
 
             //console.log(this.dropzone.getAcceptedFiles());
         },
@@ -102,12 +138,24 @@ export default {
                     this.post = res.data.data
                 })
         },
-        handleImageAdded: function(file, Editor, cursorLocation, resetUploader) {
+
+        event(){
+            if(this.event_edit){
+                this.event_edit = null
+            }
+            else if(!this.event_edit){
+                this.event_edit = 1
+            }
+
+            console.log(this.event_edit)
+        },
+
+        handleImageAdded: function (file, Editor, cursorLocation, resetUploader) {
 
             const formData = new FormData();
             formData.append("image", file);
 
-            axios.post('/api/posts/images',formData)
+            axios.post('/api/posts/images', formData)
                 .then(result => {
                     const url = result.data.url; // Get url from response
                     Editor.insertEmbed(cursorLocation, "image", url);
@@ -123,5 +171,13 @@ export default {
 </script>
 
 <style scoped>
+.dz-success-mark,
+.dz-error-mark {
+    display: none;
+}
+
+.ql-editor p img {
+    width: 50%;
+}
 
 </style>
