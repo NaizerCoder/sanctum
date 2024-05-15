@@ -27,4 +27,12 @@ class StoreRequest extends FormRequest
             'content' => 'nullable|string'
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'title.required' => 'обязательно для заполнения',
+            'images.required' => 'добавьте изображение',
+        ];
+    }
 }
