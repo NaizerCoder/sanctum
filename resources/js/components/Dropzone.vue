@@ -1,5 +1,5 @@
 <template>
-    <form class="w-50">
+    <form v-if="this.event_edit" class="w-50">
         <div w-25>
             <input v-model="title" type="text" class="form-control mb-2" placeholder="title">
         </div>
@@ -19,8 +19,28 @@
         <input @click.prevent="store" type="submit" class="btn btn-success mb-3" value="Отправить">
     </form>
 
+    <form v-if="this.event_edit === false" class="w-50">
+        <div w-25>
+            <input v-model="post.title" type="text" class="form-control mb-2"  placeholder="title">
+        </div>
+        <div v-if="this.errors.title" class="text-danger" style="margin-top: -10px">{{ this.errors.title }}</div>
+        <div class="mb-2">
+            <VueEditor v-model="content"
+                       useCustomImageHandler
+                       @image-added="handleImageAdded"
+                       :editor-toolbar="customToolbar"
+            />
+        </div>
+        <div ref="dropzone" class="h-auto pt-4 pb-4 mb-3 w-25 text-center border-dashed rounded bgd-gray"
+             style="cursor: pointer;">
+            UPLOAD IMAGES
+        </div>
+        <div v-if="this.errors.images" class="text-danger" style="margin-top: -10px">{{ this.errors.images }}</div>
+        <input @click.prevent="store" type="submit" class="btn btn-success mb-3" value="Отправить">
+    </form>
+
     <h2>ПОСЛЕДНЕЕ СООБЩЕНИЕ</h2>
-    <a @click.prevent="event" href="#">EDIT</a>
+    <a @click.prevent="eventEdit" href="#">EDIT</a>
 
     <div v-if="post">
         <table class="table table-bordered">
@@ -89,7 +109,7 @@ export default {
                 images: null,
                 title: null
             },
-            event_edit: null,
+            event_edit: true,
         }
     },
     mounted() {
@@ -139,12 +159,12 @@ export default {
                 })
         },
 
-        event(){
+        eventEdit(){
             if(this.event_edit){
-                this.event_edit = null
+                this.event_edit = false
             }
             else if(!this.event_edit){
-                this.event_edit = 1
+                this.event_edit = true
             }
 
             console.log(this.event_edit)
@@ -176,8 +196,8 @@ export default {
     display: none;
 }
 
-.ql-editor p img {
-    width: 50%;
+.ql-editor p img{
+    display: none !important;
 }
 
 </style>
