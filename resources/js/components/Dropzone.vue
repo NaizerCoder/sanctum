@@ -1,46 +1,53 @@
 <template>
-    <form v-if="this.event_edit" class="w-50">
-        <div w-25>
-            <input v-model="title" type="text" class="form-control mb-2" placeholder="title">
-        </div>
-        <div v-if="this.errors.title" class="text-danger" style="margin-top: -10px">{{ this.errors.title }}</div>
-        <div class="mb-2">
-            <VueEditor v-model="content"
-                       useCustomImageHandler
-                       @image-added="handleImageAdded"
-                       :editor-toolbar="customToolbar"
-            />
-        </div>
-        <div ref="dropzone" class="h-auto pt-4 pb-4 mb-3 w-25 text-center border-dashed rounded bgd-gray"
-             style="cursor: pointer;">
-            UPLOAD IMAGES
-        </div>
-        <div v-if="this.errors.images" class="text-danger" style="margin-top: -10px">{{ this.errors.images }}</div>
-        <input @click.prevent="store" type="submit" class="btn btn-success mb-3" value="Отправить">
-    </form>
 
-    <form v-if="this.event_edit === false" class="w-50">
-        <div w-25>
-            <input v-model="post.title" type="text" class="form-control mb-2"  placeholder="title">
-        </div>
-        <div v-if="this.errors.title" class="text-danger" style="margin-top: -10px">{{ this.errors.title }}</div>
-        <div class="mb-2">
-            <VueEditor v-model="content"
-                       useCustomImageHandler
-                       @image-added="handleImageAdded"
-                       :editor-toolbar="customToolbar"
-            />
-        </div>
-        <div ref="dropzone" class="h-auto pt-4 pb-4 mb-3 w-25 text-center border-dashed rounded bgd-gray"
-             style="cursor: pointer;">
-            UPLOAD IMAGES
-        </div>
-        <div v-if="this.errors.images" class="text-danger" style="margin-top: -10px">{{ this.errors.images }}</div>
-        <input @click.prevent="store" type="submit" class="btn btn-success mb-3" value="Отправить">
-    </form>
+    <div :class="this.event_edit ? 'd-none' : 'd-block' ">
+        <form class="w-50">
+            <div class="w-25">
+                <input v-model="title" type="text" class="form-control mb-2" placeholder="title">
+            </div>
+            <div v-if="this.errors.title" class="text-danger" style="margin-top: -10px">{{ this.errors.title }}</div>
+            <div class="mb-2" style="width:50%">
+                <VueEditor v-model="content"
+                           useCustomImageHandler
+                           @image-added="handleImageAdded"
+                           :editor-toolbar="customToolbar"
+                />
+            </div>
+            <div ref="dropzone" class="h-auto pt-4 pb-4 mb-3 text-center border-dashed rounded bgd-gray"
+                 style="cursor: pointer; width:20%">
+                UPLOAD IMAGES
+            </div>
+            <div v-if="this.errors.images" class="text-danger" style="margin-top: -10px">{{ this.errors.images }}</div>
+            <input @click.prevent="store" type="submit" class="btn btn-success mb-3" value="Отправить">
+        </form>
+    </div>
 
+    <!--EDIT-->
+    <div :class="this.event_edit ? 'd-block' : 'd-none' ">
+        <form class="w-50">
+            <div class="w-25">
+                <input v-model="post.title" type="text" class="form-control mb-2" placeholder="title">
+            </div>
+            <div v-if="this.errors.title" class="text-danger" style="margin-top: -10px">{{ this.errors.title }}</div>
+            <div class="mb-2" style="width:50%">
+                <VueEditor v-model="post.content"
+                           useCustomImageHandler
+                           @image-added="handleImageAdded"
+                           :editor-toolbar="customToolbar"
+                />
+            </div>
+            <div ref="dropzoneEdit" class="h-auto pt-4 pb-4 mb-3 text-center border-dashed rounded bgd-gray"
+                 style="cursor: pointer; width:20%">
+                UPLOAD IMAGES
+            </div>
+            <div v-if="this.errors.images" class="text-danger" style="margin-top: -10px">{{ this.errors.images }}</div>
+            <input @click.prevent="update" type="submit" class="btn btn-success mb-3" value="Обновить">
+        </form>
+    </div>
+
+    <!--CONTENT-->
     <h2>ПОСЛЕДНЕЕ СООБЩЕНИЕ</h2>
-    <a @click.prevent="eventEdit" href="#">EDIT</a>
+    <a @click.prevent="isEdit" href="#">редактировать</a>
 
     <div v-if="post">
         <table class="table table-bordered">
@@ -91,6 +98,7 @@ export default {
     data() {
         return {
             dropzone: null,
+            dropzoneEdit: null,
             title: '',
             csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             post: {},
@@ -109,7 +117,7 @@ export default {
                 images: null,
                 title: null
             },
-            event_edit: true,
+            event_edit: false,
         }
     },
     mounted() {
@@ -122,8 +130,21 @@ export default {
             },
             acceptedFiles: "image/jpeg,image/png,image/gif"
         })
+
+        this.dropzoneEdit = new Dropzone(this.$refs.dropzoneEdit, {
+            url: '/api/posts',
+            autoProcessQueue: false,
+            addRemoveLinks: true,
+            headers: {
+                'x-csrf-token': this.csrf,
+            },
+            acceptedFiles: "image/jpeg,image/png,image/gif"
+        })
         this.getPost()
+        this.setDropzoneEdit()
+
     },
+
     methods: {
         store() {
             const data = new FormData()
@@ -159,15 +180,67 @@ export default {
                 })
         },
 
-        eventEdit(){
-            if(this.event_edit){
-                this.event_edit = false
-            }
-            else if(!this.event_edit){
-                this.event_edit = true
-            }
+        isEdit() {
+            if (this.event_edit) {
 
-            console.log(this.event_edit)
+                this.event_edit = false
+                this.dropzoneEdit.disable()
+            } else {
+                this.event_edit = true
+                console.log(this.post)
+            }
+        },
+
+        // setDropzoneEdit() {
+        //
+        //     axios.get('/api/posts')
+        //         .then(res => {
+        //
+        //             console.log(res.data.data);
+        //             res.data.data.images.forEach(image => {
+        //                 let file = {name: "Filename 2", size: 12345};
+        //                 this.dropzoneEdit.displayExistingFile(file, image.url);
+        //             })
+        //
+        //         })
+        //
+        // },
+
+        setDropzoneEdit() {
+
+            this.getPost()
+            console.log(this.post);
+
+        },
+
+        computed: {},
+
+        update() {
+
+            const dataUpdate = new FormData()
+            const files = this.dropzone.getAcceptedFiles()
+
+            files.forEach(file => {
+                dataUpdate.append('images[]', file)
+                this.dropzone.removeFile(file)
+            })
+
+            dataUpdate.append('title', this.post.title)
+            dataUpdate.append('content', this.post.content)
+            dataUpdate.append('_method', 'PATCH')
+
+            console.log(dataUpdate)
+
+            axios.post(`/api/posts/${this.post.id}`, dataUpdate)
+                .then(res => {
+                    this.getPost()
+                })
+                .catch(error => {
+                    if (error.response.data.errors) {
+                        this.errors.images = (error.response.data.errors.images) ? error.response.data.errors.images[0] : null
+                        this.errors.title = (error.response.data.errors.title) ? error.response.data.errors.title[0] : null
+                    }
+                })
         },
 
         handleImageAdded: function (file, Editor, cursorLocation, resetUploader) {
@@ -193,10 +266,10 @@ export default {
 <style scoped>
 .dz-success-mark,
 .dz-error-mark {
-    display: none;
+    display: none !important;;
 }
 
-.ql-editor p img{
+.ql-editor p img {
     display: none !important;
 }
 
