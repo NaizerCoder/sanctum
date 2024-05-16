@@ -22,6 +22,7 @@ Route::group(['middleware' => 'auth:sanctum', 'namespace' => 'App\Http\Controlle
 
         Route::post('/','StoreController');
         Route::get('/','IndexController');
+        Route::patch('/{post}','UpdateController');
 
         Route::group(['prefix'=>'images', 'namespace'=>'Image'], function(){
             Route::post('/','StoreController');
