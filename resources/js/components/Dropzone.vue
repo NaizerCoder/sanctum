@@ -48,7 +48,7 @@
     <!--CONTENT-->
     <h2>ПОСЛЕДНЕЕ СООБЩЕНИЕ
         <a @click.prevent="isEdit" href="#">
-            <BIconPencil />
+            <BIconPencil/>
         </a>
     </h2>
 
@@ -70,12 +70,16 @@
                 <td class="w-25">
                     Исходное изображение
                     <br/>
-                    <img :src=image.url class="mb-2" style="width:50%" alt="">
+                    <a :href=image.url target="top">
+                        <img :src=image.url class="mb-2" style="width:50%" alt="">
+                    </a>
                 </td>
                 <td class="w-25">
                     Миниатюра 100x100
                     <br/>
-                    <img :src=image.prev_url alt="">
+                    <a :href=image.prev_url target="top">
+                        <img :src=image.prev_url alt="">
+                    </a>
                 </td>
             </tr>
             <tr v-if="post.content">
@@ -152,7 +156,7 @@ export default {
             acceptedFiles: "image/jpeg,image/png,image/gif"
         })
 
-        this.dropzoneEdit.on('removedfile',(file) => {
+        this.dropzoneEdit.on('removedfile', (file) => {
 
             this.idImgDel.push(file.id)
         })
@@ -207,10 +211,15 @@ export default {
         },
 
         setDropzoneEdit() {
+
+            document.querySelectorAll(".dz-preview").forEach(el => el.remove())
+
             this.post.images.forEach(image => {
                 let file = {id: image.id, name: image.name, size: image.size};
                 this.dropzoneEdit.displayExistingFile(file, image.url);
+
             })
+
         },
 
         update() {
@@ -220,6 +229,7 @@ export default {
 
             files.forEach(file => {
                 dataUpdate.append('images[]', file)
+                this.dropzoneEdit.removeFile(file)
             })
 
             this.idImgDel.forEach(image => {
@@ -232,6 +242,8 @@ export default {
 
             axios.post(`/api/posts/${this.post.id}`, dataUpdate)
                 .then(res => {
+
+                    this.event_edit = false
                     this.getPost()
                 })
                 .catch(error => {
@@ -262,14 +274,13 @@ export default {
 }
 </script>
 
-<style scoped>
-.dz-success-mark,
-.dz-error-mark {
+<style>
+.dz-success-mark, .dz-error-mark {
     display: none !important;;
 }
 
 .ql-editor p img {
-    display: none !important;
+    width: 50%;
 }
 
 </style>
