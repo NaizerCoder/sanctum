@@ -4,7 +4,7 @@ namespace App\Http\Requests\Dropzone\Post;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UodateRequest extends FormRequest
+class UpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +23,9 @@ class UodateRequest extends FormRequest
     {
         return [
             'title' => 'required',
-            'images' => 'array',
-            'content' => 'nullable|string'
+            'images' => 'array', //новые изображения
+            'content' => 'nullable|string',
+            'id_img_del' => 'nullable' //сюда попадет массив из ID изображений на удаление
         ];
     }
 

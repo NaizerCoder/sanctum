@@ -6,7 +6,7 @@
                 <input v-model="title" type="text" class="form-control mb-2" placeholder="title">
             </div>
             <div v-if="this.errors.title" class="text-danger" style="margin-top: -10px">{{ this.errors.title }}</div>
-            <div class="mb-2" style="width:50%">
+            <div class="mb-2" style="width:70%">
                 <VueEditor v-model="content"
                            useCustomImageHandler
                            @image-added="handleImageAdded"
@@ -14,7 +14,7 @@
                 />
             </div>
             <div ref="dropzone" class="h-auto pt-4 pb-4 mb-3 text-center border-dashed rounded bgd-gray"
-                 style="cursor: pointer; width:20%">
+                 style="cursor: pointer; max-width:30%">
                 UPLOAD IMAGES
             </div>
             <div v-if="this.errors.images" class="text-danger" style="margin-top: -10px">{{ this.errors.images }}</div>
@@ -29,7 +29,7 @@
                 <input v-model="post.title" type="text" class="form-control mb-2" placeholder="title">
             </div>
             <div v-if="this.errors.title" class="text-danger" style="margin-top: -10px">{{ this.errors.title }}</div>
-            <div class="mb-2" style="width:50%">
+            <div class="mb-2" style="width:70%">
                 <VueEditor v-model="post.content"
                            useCustomImageHandler
                            @image-added="handleImageAdded"
@@ -37,7 +37,7 @@
                 />
             </div>
             <div ref="dropzoneEdit" class="h-auto pt-4 pb-4 mb-3 text-center border-dashed rounded bgd-gray"
-                 style="cursor: pointer; width:20%">
+                 style="cursor: pointer; max-width:30%">
                 UPLOAD IMAGES
             </div>
             <div v-if="this.errors.images" class="text-danger" style="margin-top: -10px">{{ this.errors.images }}</div>
@@ -46,10 +46,17 @@
     </div>
 
     <!--CONTENT-->
-    <h2>ПОСЛЕДНЕЕ СООБЩЕНИЕ</h2>
-    <a @click.prevent="isEdit" href="#">редактировать</a>
+    <h2>ПОСЛЕДНЕЕ СООБЩЕНИЕ
+        <a @click.prevent="isEdit" href="#">
+            <BIconPencil />
+        </a>
+    </h2>
 
-    <div v-if="post">
+    <div v-if="spinner" class="z-2 p-1">
+        <b-spinner small variant="primary" label="Spinning"></b-spinner>
+    </div>
+
+    <div v-if="post" class="w-75">
         <table class="table table-bordered">
             <tr>
                 <td colspan="2">
@@ -60,12 +67,12 @@
                 <td colspan="2" class="text-center">Изображения DROPBOX</td>
             </tr>
             <tr v-for="image in post.images">
-                <td>
+                <td class="w-25">
                     Исходное изображение
                     <br/>
                     <img :src=image.url class="mb-2" style="width:50%" alt="">
                 </td>
-                <td>
+                <td class="w-25">
                     Миниатюра 100x100
                     <br/>
                     <img :src=image.prev_url alt="">
@@ -87,11 +94,13 @@
 <script>
 import {Dropzone} from "dropzone";
 import {VueEditor} from "vue3-editor"
+import {BIconPencil} from "bootstrap-icons-vue";
 
 export default {
     name: "Dropzone",
 
     components: {
+        BIconPencil,
         VueEditor
     },
 
@@ -118,6 +127,8 @@ export default {
                 title: null
             },
             event_edit: false,
+            spinner: true,
+            idImgDel: []
         }
     },
     mounted() {
@@ -140,8 +151,13 @@ export default {
             },
             acceptedFiles: "image/jpeg,image/png,image/gif"
         })
+
+        this.dropzoneEdit.on('removedfile',(file) => {
+
+            this.idImgDel.push(file.id)
+        })
+
         this.getPost()
-        this.setDropzoneEdit()
 
     },
 
@@ -171,65 +187,48 @@ export default {
                     }
                 })
 
-            //console.log(this.dropzone.getAcceptedFiles());
         },
         getPost() {
             axios.get('/api/posts')
                 .then(res => {
+                    this.spinner = false
                     this.post = res.data.data
+
+                    this.setDropzoneEdit() //инициализация скрытого Dropzone для редактирования
                 })
         },
 
         isEdit() {
             if (this.event_edit) {
-
                 this.event_edit = false
-                this.dropzoneEdit.disable()
             } else {
                 this.event_edit = true
-                console.log(this.post)
             }
         },
 
-        // setDropzoneEdit() {
-        //
-        //     axios.get('/api/posts')
-        //         .then(res => {
-        //
-        //             console.log(res.data.data);
-        //             res.data.data.images.forEach(image => {
-        //                 let file = {name: "Filename 2", size: 12345};
-        //                 this.dropzoneEdit.displayExistingFile(file, image.url);
-        //             })
-        //
-        //         })
-        //
-        // },
-
         setDropzoneEdit() {
-
-            this.getPost()
-            console.log(this.post);
-
+            this.post.images.forEach(image => {
+                let file = {id: image.id, name: image.name, size: image.size};
+                this.dropzoneEdit.displayExistingFile(file, image.url);
+            })
         },
-
-        computed: {},
 
         update() {
 
             const dataUpdate = new FormData()
-            const files = this.dropzone.getAcceptedFiles()
+            const files = this.dropzoneEdit.getAcceptedFiles()
 
             files.forEach(file => {
                 dataUpdate.append('images[]', file)
-                this.dropzone.removeFile(file)
+            })
+
+            this.idImgDel.forEach(image => {
+                dataUpdate.append('id_img_del[]', image)
             })
 
             dataUpdate.append('title', this.post.title)
             dataUpdate.append('content', this.post.content)
             dataUpdate.append('_method', 'PATCH')
-
-            console.log(dataUpdate)
 
             axios.post(`/api/posts/${this.post.id}`, dataUpdate)
                 .then(res => {
