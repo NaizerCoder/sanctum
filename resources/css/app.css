@@ -14,3 +14,7 @@ input:focus,
 
 .border-dashed {border: 2px dashed grey}
 .bgd-gray{background-color: #d2d7d7}
+
+.dz-success-mark, .dz-error-mark {
+    display: none !important;;
+}
