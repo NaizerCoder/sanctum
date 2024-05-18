@@ -17,26 +17,38 @@ class UpdateController extends Controller
 
         $data = $request->validated();
 
-        $imagesDel = $data['id_img_del'] ?? null; // $imagesDel = isset($data['id_img_del']) ? $data['id_img_del'] : null;
+        $imagesIdDel = $data['id_img_del'] ?? null; // $imagesIdDel = isset($data['id_img_del']) ? $data['id_img_del'] : null; DROPZONE
+        $imagesUrlDel = $data['url_img_del'] ?? null; // vueEditor
+
         $images = $data['images'] ?? null;
 
-        unset($data['images'], $data['id_img_del'] );
+        unset($data['images'], $data['id_img_del'], $data['url_img_del']);
 
+        $post->update($data); //update title + content
+
+        /*УДАЛЕНИЕ ИЗОБРАЖЕНИЙ ИЗ DROPZONE*/
         $curImages = $post->images;
-
-        if($imagesDel){
+        if($imagesIdDel){
             foreach ($curImages as $curImage){
 
-                if(in_array($curImage->id,$imagesDel)){
-                    Storage::disk('public')->delete($curImage->path);
-                    Storage::disk('public')->delete(str_replace('images/','images/prev_', $curImage->path));
+                if(in_array($curImage->id,$imagesIdDel)){
+                    Storage::disk('public')->delete($curImage->path); //основное
+                    Storage::disk('public')->delete(str_replace('images/','images/prev_', $curImage->path)); //превью
                     $curImage->delete();
                 }
             }
         }
 
-        //$post = POST::firstOrCreate($data);
+        /*УДАЛЕНИЕ ИЗОБРАЖЕНИЙ ИЗ VueEditor*/
+        if($imagesUrlDel){
+            foreach ($imagesUrlDel as $imageUrlDel){
+                $pathRoot = $request->root().'/storage/'; //доменное имя + storage (получится images/name_file.ext)
+                $nameImageUrlDel = str_replace($pathRoot,'',$imageUrlDel);
+                Storage::disk('public')->delete($nameImageUrlDel);
+            }
+        }
 
+        /*ДОБАВЛЕНИЕ ИЗОБРАЖЕНИЙ DROPBOX*/
         if($images) {
 
             foreach ($images as $image) {

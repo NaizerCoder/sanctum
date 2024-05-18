@@ -1,96 +1,115 @@
 <template>
 
-    <div :class="this.event_edit ? 'd-none' : 'd-block' ">
-        <form class="w-50">
-            <div class="w-25">
-                <input v-model="title" type="text" class="form-control mb-2" placeholder="title">
-            </div>
-            <div v-if="this.errors.title" class="text-danger" style="margin-top: -10px">{{ this.errors.title }}</div>
-            <div class="mb-2" style="width:70%">
-                <VueEditor v-model="content"
-                           useCustomImageHandler
-                           @image-added="handleImageAdded"
-                           :editor-toolbar="customToolbar"
-                />
-            </div>
-            <div ref="dropzone" class="h-auto pt-4 pb-4 mb-3 text-center border-dashed rounded bgd-gray"
-                 style="cursor: pointer; max-width:30%">
-                UPLOAD IMAGES
-            </div>
-            <div v-if="this.errors.images" class="text-danger" style="margin-top: -10px">{{ this.errors.images }}</div>
-            <input @click.prevent="store" type="submit" class="btn btn-success mb-3" value="Отправить">
-        </form>
-    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm">
+                <div :class="this.event_edit ? 'd-none' : 'd-block' ">
+                    <form class="">
+                        <div style="width:70%">
+                            <input v-model="title" type="text" class="form-control mb-2" placeholder="Заголовок">
+                        </div>
+                        <div v-if="this.errors.title" class="text-danger" style="margin-top: -10px">{{
+                                this.errors.title
+                            }}
+                        </div>
+                        <div class="mb-2" style="width:80%">
+                            <VueEditor v-model="content"
+                                       useCustomImageHandler
+                                       @image-added="handleImageAdded"
+                                       :editor-toolbar="customToolbar"
+                            />
+                        </div>
+                        <div ref="dropzone" class="h-auto pt-4 pb-4 mb-3 text-center border-dashed rounded bgd-gray"
+                             style="cursor: pointer; max-width:30%">
+                            UPLOAD IMAGES
+                        </div>
+                        <div v-if="this.errors.images" class="text-danger" style="margin-top: -10px">{{
+                                this.errors.images
+                            }}
+                        </div>
+                        <input @click.prevent="store" type="submit" class="btn btn-success mb-3" value="Отправить">
+                    </form>
+                </div>
 
-    <!--EDIT-->
-    <div :class="this.event_edit ? 'd-block' : 'd-none' ">
-        <form class="w-50">
-            <div class="w-25">
-                <input v-model="post.title" type="text" class="form-control mb-2" placeholder="title">
+                <!--EDIT-->
+                <div :class="this.event_edit ? 'd-block' : 'd-none' ">
+                    <form class="">
+                        <div style="width:70%">
+                            <input v-model="post.title" type="text" class="form-control mb-2" placeholder="title">
+                        </div>
+                        <div v-if="this.errors.title" class="text-danger" style="margin-top: -10px">{{
+                                this.errors.title
+                            }}
+                        </div>
+                        <div class="mb-2" style="width:80%">
+                            <VueEditor v-model="post.content"
+                                       useCustomImageHandler
+                                       @image-added="handleImageAdded"
+                                       @image-removed="handleImageRemoved"
+                                       :editor-toolbar="customToolbar"
+                            />
+                        </div>
+                        <div ref="dropzoneEdit" class="h-auto pt-4 pb-4 mb-3 text-center border-dashed rounded bgd-gray"
+                             style="cursor: pointer; max-width:40%">
+                            UPLOAD IMAGES
+                        </div>
+                        <div v-if="this.errors.images" class="text-danger" style="margin-top: -10px">{{
+                                this.errors.images
+                            }}
+                        </div>
+                        <input @click.prevent="update" type="submit" class="btn btn-success mb-3" value="Обновить">
+                    </form>
+                </div>
             </div>
-            <div v-if="this.errors.title" class="text-danger" style="margin-top: -10px">{{ this.errors.title }}</div>
-            <div class="mb-2" style="width:70%">
-                <VueEditor v-model="post.content"
-                           useCustomImageHandler
-                           @image-added="handleImageAdded"
-                           :editor-toolbar="customToolbar"
-                />
-            </div>
-            <div ref="dropzoneEdit" class="h-auto pt-4 pb-4 mb-3 text-center border-dashed rounded bgd-gray"
-                 style="cursor: pointer; max-width:30%">
-                UPLOAD IMAGES
-            </div>
-            <div v-if="this.errors.images" class="text-danger" style="margin-top: -10px">{{ this.errors.images }}</div>
-            <input @click.prevent="update" type="submit" class="btn btn-success mb-3" value="Обновить">
-        </form>
-    </div>
-
-    <!--CONTENT-->
-    <h2>ПОСЛЕДНЕЕ СООБЩЕНИЕ
-        <a @click.prevent="isEdit" href="#">
-            <BIconPencil/>
-        </a>
-    </h2>
-
-    <div v-if="spinner" class="z-2 p-1">
-        <b-spinner small variant="primary" label="Spinning"></b-spinner>
-    </div>
-
-    <div v-if="post" class="w-75">
-        <table class="table table-bordered">
-            <tr>
-                <td colspan="2">
-                    <h4>{{ post.title }}</h4>
-                </td>
-            </tr>
-            <tr v-if="post.images">
-                <td colspan="2" class="text-center">Изображения DROPBOX</td>
-            </tr>
-            <tr v-for="image in post.images">
-                <td class="w-25">
-                    Исходное изображение
-                    <br/>
-                    <a :href=image.url target="top">
-                        <img :src=image.url class="mb-2" style="width:50%" alt="">
+            <div class="col-sm">
+                <!--CONTENT-->
+                <h2>ПОСЛЕДНЕЕ СООБЩЕНИЕ
+                    <a @click.prevent="isEdit" href="#">
+                        <BIconPencil/>
                     </a>
-                </td>
-                <td class="w-25">
-                    Миниатюра 100x100
-                    <br/>
-                    <a :href=image.prev_url target="top">
-                        <img :src=image.prev_url alt="">
-                    </a>
-                </td>
-            </tr>
-            <tr v-if="post.content">
-                <td colspan="2" class="text-center">
-                    Контент
-                    <div class="ql-editor" v-html="post.content"></div>
-                </td>
+                </h2>
 
-            </tr>
-        </table>
+                <div v-if="spinner" class="z-2 p-1">
+                    <b-spinner small variant="primary" label="Spinning"></b-spinner>
+                </div>
 
+                <div v-if="post" class="">
+                    <table class="table table-bordered">
+                        <tr>
+                            <td colspan="2">
+                                <h4>{{ post.title }}</h4>
+                            </td>
+                        </tr>
+                        <tr v-if="post.images">
+                            <td colspan="2" class="text-center">Изображения DROPBOX</td>
+                        </tr>
+                        <tr v-for="image in post.images">
+                            <td class="w-25">
+                                Исходное изображение
+                                <br/>
+                                <a :href=image.url target="top">
+                                    <img :src=image.url class="mb-2" style="width:70%" alt="">
+                                </a>
+                            </td>
+                            <td class="w-25">
+                                Миниатюра 100x100
+                                <br/>
+                                <a :href=image.prev_url target="top">
+                                    <img :src=image.prev_url alt="">
+                                </a>
+                            </td>
+                        </tr>
+                        <tr v-if="post.content">
+                            <td colspan="2" class="text-center">
+                                Контент
+                                <div class="ql-editor" v-html="post.content"></div>
+                            </td>
+
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
 </template>
@@ -119,10 +138,17 @@ export default {
             customToolbar: [
                 [{size: ['small', false, 'large', 'huge']}],
                 ["bold", "italic", "underline"],
-                [{'align': [false]}],
-                [{'align': ['center']}],
-                [{'align': ['right']}],
-                [{header: [1, 2, 3, 4, 5, 6, false]}],
+                [
+                    { align: "" },
+                    { align: "center" },
+                    { align: "right" },
+                    { align: "justify" }
+                ],
+                [
+                    {header: [1, 2, 3, ""]}
+
+
+                ],
                 [{list: "ordered"}, {list: "bullet"}],
                 ["image"],
             ],
@@ -132,7 +158,8 @@ export default {
             },
             event_edit: false,
             spinner: true,
-            idImgDel: []
+            idImgDel: [], //удаление IMAGES из DROPZONE
+            urlImgDel: [], //удаление IMAGES из VueEditor - handleImageRemoved
         }
     },
     mounted() {
@@ -212,7 +239,10 @@ export default {
 
         setDropzoneEdit() {
 
+            /*очистка поля DROPZONE от накопления изобажений при Update*/
             document.querySelectorAll(".dz-preview").forEach(el => el.remove())
+            /*вариант 2*/
+            //this.dropzoneEdit.previewsContainer.querySelectorAll(".dz-preview").forEach(el => el.remove())
 
             this.post.images.forEach(image => {
                 let file = {id: image.id, name: image.name, size: image.size};
@@ -232,8 +262,14 @@ export default {
                 this.dropzoneEdit.removeFile(file)
             })
 
+            /*для DROPZONE*/
             this.idImgDel.forEach(image => {
                 dataUpdate.append('id_img_del[]', image)
+            })
+
+            /*для VueEditor*/
+            this.urlImgDel.forEach(image => {
+                dataUpdate.append('url_img_del[]', image)
             })
 
             dataUpdate.append('title', this.post.title)
@@ -254,6 +290,7 @@ export default {
                 })
         },
 
+        /*Изображения сохраняются автоматически после добавления в форме - поправить*/
         handleImageAdded: function (file, Editor, cursorLocation, resetUploader) {
 
             const formData = new FormData();
@@ -268,7 +305,12 @@ export default {
                 .catch(err => {
                     console.log(err);
                 });
+        },
+
+        handleImageRemoved(url){
+            this.urlImgDel.push(url)
         }
+
 
     }
 }
