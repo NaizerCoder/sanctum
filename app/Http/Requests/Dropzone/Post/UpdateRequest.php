@@ -25,7 +25,8 @@ class UpdateRequest extends FormRequest
             'title' => 'required',
             'images' => 'array', //новые изображения
             'content' => 'nullable|string',
-            'id_img_del' => 'nullable' //сюда попадет массив из ID изображений на удаление
+            'id_img_del' => 'nullable', //сюда попадет массив из ID изображений DROPZONE на удаление
+            'url_img_del' => 'nullable', //сюда попадет массив из URL изображений vueEditor на удаление
         ];
     }
 
