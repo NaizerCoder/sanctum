@@ -33,7 +33,6 @@ class StoreController extends Controller
             ]);
 
             $image_prev = ImageManager::imagick()->read($image);
-
             $image_prev->resize(100, 100)->save(storage_path('app/public/images/'.$name_prev));
 
 

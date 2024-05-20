@@ -146,8 +146,6 @@ export default {
                 ],
                 [
                     {header: [1, 2, 3, ""]}
-
-
                 ],
                 [{list: "ordered"}, {list: "bullet"}],
                 ["image"],
