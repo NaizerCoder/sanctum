@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Post extends Model
 {
     use HasFactory;
-    protected $guarded = false;
+    protected $guarded = [];
     protected $table = 'posts';
 
     public function Images(){
