@@ -1,6 +1,6 @@
 <template>
     <div class="">
-        Personal page
+        Some page for redirect after success login
     </div>
 </template>
 
