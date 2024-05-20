@@ -21,7 +21,8 @@
                         </div>
                         <div ref="dropzone" class="h-auto pt-4 pb-4 mb-3 text-center border-dashed rounded bgd-gray"
                              style="cursor: pointer; max-width:30%">
-                            UPLOAD IMAGES
+                            UPLOAD IMAGES <br />
+                            (drag & drop)
                         </div>
                         <div v-if="this.errors.images" class="text-danger" style="margin-top: -10px">{{
                                 this.errors.images
@@ -51,7 +52,8 @@
                         </div>
                         <div ref="dropzoneEdit" class="h-auto pt-4 pb-4 mb-3 text-center border-dashed rounded bgd-gray"
                              style="cursor: pointer; max-width:40%">
-                            UPLOAD IMAGES
+                            UPLOADED IMAGES <br />
+                            (drag & drop)
                         </div>
                         <div v-if="this.errors.images" class="text-danger" style="margin-top: -10px">{{
                                 this.errors.images
@@ -64,8 +66,11 @@
             <div class="col-sm">
                 <!--CONTENT-->
                 <h2>ПОСЛЕДНЕЕ СООБЩЕНИЕ
-                    <a @click.prevent="isEdit" href="#">
+                    <a v-if="this.event_edit  === false" @click.prevent="isEdit" href="#">
                         <BIconPencil/>
+                    </a>
+                    <a v-if="this.event_edit" @click.prevent="isEdit" href="#">
+                        X
                     </a>
                 </h2>
 
